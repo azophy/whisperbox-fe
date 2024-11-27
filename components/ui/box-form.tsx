@@ -21,15 +21,20 @@ const FormSchema = z.object({
   title: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
-  numKeyHolder: z.number(),
+  numKeyHolder: z.coerce.number().positive(),
+  numMinOpeningKey: z.coerce.number().positive(),
   passphrases: z.string().array(),
 })
+  .refine(schema => schema.numKeyHolder >= schema.numMinOpeningKey, "minimum key holder must not exceed number of total keys")
 
 export function BoxForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      username: "",
+      title: "example title",
+      numKeyHolder: 1,
+      numMinOpeningKey: 1,
+      passphrases: [ "" ],
     },
   })
 
@@ -42,7 +47,7 @@ export function BoxForm() {
         </pre>
       ),
     })*/
-    console.log(data)
+    alert(JSON.stringify(data))
   }
 
   return (
@@ -59,6 +64,38 @@ export function BoxForm() {
               </FormControl>
               <FormDescription>
                 Title of the box
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="numKeyHolder"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Number of Key Holders</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="1" {...field} />
+              </FormControl>
+              <FormDescription>
+                Number of passphrase that act as key for the box
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="numMinOpeningKey"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Number of Minimum Opening Keys</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="1" {...field} />
+              </FormControl>
+              <FormDescription>
+                Number of required passphrases to decrypt the box
               </FormDescription>
               <FormMessage />
             </FormItem>
