@@ -1,9 +1,12 @@
-import { Button } from "@/components/ui/button"
+import { BoxForm } from "@/components/ui/box-form"
 
 export default function Home() {
   return (
     <div>
-      <Button>Click me</Button>
+      <h1>Whisperbox</h1>
+
+      <h2>create new whisper box</h2>
+      <BoxForm/>
     </div>
   )
 }
