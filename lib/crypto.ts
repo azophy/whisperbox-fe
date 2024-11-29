@@ -1,5 +1,7 @@
-//const crypto = require('node:crypto');
 import * as crypto from 'crypto'
+import * as SSS from 'shamir-secret-sharing'
+
+const toUint8Array = (data: string) => new TextEncoder().encode(data);
 
 export function generateKeyPair() {
   const res = crypto.generateKeyPairSync('rsa', {
@@ -32,4 +34,13 @@ export const decryptAsym = (encryptedText, privateKey) => {
   ).toString('utf8');
 }
 
+export async function splitKey(key, passphrases, threshold) {
+  const numShards = passphrases.length
+  const shards = await SSS.split(toUint8Array(key), numShards, threshold)
+  return shards
+}
 
+export async function joinKey(...shards) {
+  const privateKey = await SSS.combine(shards)
+  return new TextDecoder('utf-8').decode(privateKey)
+}
