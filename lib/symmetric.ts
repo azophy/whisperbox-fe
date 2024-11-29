@@ -44,7 +44,6 @@ export async function encryptSym(secretData:string, password:any) {
         iv: iv,
       },
       aesKey,
-      //enc.encode(secretData)
       secretData
     );
 
@@ -64,7 +63,6 @@ export async function encryptSym(secretData:string, password:any) {
 }
 
 export async function decryptSym(encryptedData:any, password:any) {
-  try {
     const encryptedDataBuff = base64_to_buf(encryptedData);
     const salt = encryptedDataBuff.slice(0, 16);
     const iv = encryptedDataBuff.slice(16, 16 + 12);
@@ -79,10 +77,5 @@ export async function decryptSym(encryptedData:any, password:any) {
       aesKey,
       data
     );
-    //return dec.decode(decryptedContent);
     return decryptedContent
-  } catch (e) {
-    console.log(`Error - ${e}`);
-    return "";
-  }
 }

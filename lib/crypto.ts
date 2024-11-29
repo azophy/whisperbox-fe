@@ -54,11 +54,9 @@ export async function joinKey(encShards, passphrases) {
 	const res = await symmetric.decryptSym(encShard, passphrases[jj])
 	if (res) {
 	  shards.push(new Uint8Array(res))
-	  console.log(`ok ${ii}-${jj}`)
 	  continue
 	}
       } catch (e) {
-	  console.log(`no ${ii}-${jj}`)
       }
     }
   }
