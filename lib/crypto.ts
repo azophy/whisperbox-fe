@@ -1,7 +1,9 @@
 import * as crypto from 'crypto'
 import * as SSS from 'shamir-secret-sharing'
+import * as symmetric from './symmetric'
 
-const toUint8Array = (data: string) => new TextEncoder().encode(data);
+const toUint8Array = (data: any) => new TextEncoder().encode(data);
+const fromUint8Array = (data: any) => new TextDecoder().decode(data);
 
 export function generateKeyPair() {
   const res = crypto.generateKeyPairSync('rsa', {
@@ -37,10 +39,30 @@ export const decryptAsym = (encryptedText, privateKey) => {
 export async function splitKey(key, passphrases, threshold) {
   const numShards = passphrases.length
   const shards = await SSS.split(toUint8Array(key), numShards, threshold)
-  return shards
+  const res = await Promise.all(shards.map((v,i) => symmetric.encryptSym(v, passphrases[i])))
+  return res
 }
 
-export async function joinKey(...shards) {
+export async function joinKey(encShards, passphrases) {
+  let shards = []
+
+  // try all combinationa
+  for (let ii = 0; ii < encShards.length; ii++) {
+    const encShard = encShards[ii]
+    for (let jj = 0; jj < passphrases.length; jj++) {
+      try {
+	const res = await symmetric.decryptSym(encShard, passphrases[jj])
+	if (res) {
+	  shards.push(new Uint8Array(res))
+	  console.log(`ok ${ii}-${jj}`)
+	  continue
+	}
+      } catch (e) {
+	  console.log(`no ${ii}-${jj}`)
+      }
+    }
+  }
+
   const privateKey = await SSS.combine(shards)
-  return new TextDecoder('utf-8').decode(privateKey)
+  return fromUint8Array(privateKey)
 }
