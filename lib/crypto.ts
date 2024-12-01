@@ -2,7 +2,7 @@ import * as crypto from 'crypto'
 import * as SSS from 'shamir-secret-sharing'
 import * as symmetric from './symmetric'
 
-const toUint8Array = (data: any) => new TextEncoder().encode(data);
+const toUint8Array = (data: any): Uint8Array => new TextEncoder().encode(data);
 const fromUint8Array = (data: any) => new TextDecoder().decode(data);
 
 export function generateKeyPair() {
